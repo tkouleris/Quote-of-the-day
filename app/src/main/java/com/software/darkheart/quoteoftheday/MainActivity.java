@@ -10,14 +10,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
                         (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.i("Response","Success");
                                 try {
                                     JSONObject jresponse = response.getJSONObject(0);
                                     String title = " - ";
@@ -54,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
                                     txt_content.setText(content);
                                     txt_title.setText(title);
+
                                 }catch (JSONException e) {
                                     e.printStackTrace();
-
                                 }
                             }
                         }, new Response.ErrorListener() {
@@ -72,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
-
 
 }

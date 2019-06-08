@@ -1,6 +1,8 @@
 package com.software.darkheart.quoteoftheday;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -27,46 +29,66 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Context context = this;
-        final String url ="http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
-
-        final Button button = findViewById(R.id.btn_quote);
         final TextView txt_content = findViewById(R.id.txt_content);
         final TextView txt_title = findViewById(R.id.txt_title);
+        if(isNetworkAvailable() == false){
+            txt_content.setText("Error: No Internet Connection: Check Internet Connectivity!");
+            txt_title.setText(" ");
+        }
+
+        final Context context = this;
+        final String url ="http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
+        final Button button = findViewById(R.id.btn_quote);
+
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                boolean networkAvailable = isNetworkAvailable();
 
-                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
-                        (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                            @Override
-                            public void onResponse(JSONArray response) {
-                                try {
-                                    JSONObject jresponse = response.getJSONObject(0);
-                                    String title = " - ";
-                                    title = title + jresponse.getString("title");
-                                    String content = jresponse.getString("content");
-                                    content = Html.fromHtml(content).toString();
+                if( networkAvailable == false){
+                    txt_content.setText("Error: No Internet Connection: Check Internet Connectivity!");
+                    txt_title.setText(" ");
+                }
 
-                                    txt_content.setText(content);
-                                    txt_title.setText(title);
+                if( networkAvailable == true){
+                    JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                            (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                                @Override
+                                public void onResponse(JSONArray response) {
+                                    try {
+                                        JSONObject jresponse = response.getJSONObject(0);
+                                        String title = " - ";
+                                        title = title + jresponse.getString("title");
+                                        String content = jresponse.getString("content");
+                                        content = Html.fromHtml(content).toString();
 
-                                }catch (JSONException e) {
-                                    e.printStackTrace();
+                                        txt_content.setText(content);
+                                        txt_title.setText(title);
+
+                                    }catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                        }, new Response.ErrorListener() {
+                            }, new Response.ErrorListener() {
 
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                VolleyLog.d("TAG", "Error: " + error.getMessage());
-                            }
-                        });
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    VolleyLog.d("TAG", "Error: " + error.getMessage());
+                                }
+                            });
 
-                // Access the RequestQueue through your singleton class.
-                MySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+                    // Access the RequestQueue through your singleton class.
+                    MySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+                }
 
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }

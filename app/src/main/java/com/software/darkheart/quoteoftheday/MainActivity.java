@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final Context context = this;
-        final String url ="http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
+        final String url ="https://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
         final Button button = findViewById(R.id.btn_quote);
 
         button.setOnClickListener(new View.OnClickListener() {
